@@ -6,3 +6,4 @@ services:
     environment:
       - APP_PORT=8080
       - RESOURCE_CONNECTION=https://static.wongnai.com/devinterview/covid-cases.json
+      - GIN_MODE=release
