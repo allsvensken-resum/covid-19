@@ -18,8 +18,8 @@ func NewCovidService(repo repository.ICovidRepo) ICovidSrv {
 func (t covidSrv) GetCovidPatientSummary() (PatientSummaryResp, error) {
 	patients, err := t.covidRepo.GetAllCovidPatient()
 	if err != nil {
-		log.Fatal(err)
-		return PatientSummaryResp{}, errs.NewNotFoundError("Not found data")
+		log.Println(err)
+		return PatientSummaryResp{}, errs.NewNotFoundError()
 	}
 
 	patientsGroupByProvince := make(map[string]int)

@@ -81,6 +81,6 @@ func initViperConfig() {
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		log.Println("Config file not found, You can set env variable instead.")
+		log.Println("Config file not found, You should set env variable.")
 	}
 }

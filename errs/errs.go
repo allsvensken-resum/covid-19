@@ -13,10 +13,10 @@ func (e AppError) Error() string {
 	return e.Message
 }
 
-func NewNotFoundError(message string) error {
+func NewNotFoundError() error {
 	return AppError{
 		Code:    http.StatusNotFound,
-		Message: message,
+		Message: "Data Not Found",
 	}
 }
 
