@@ -2,4 +2,4 @@
 
 This application is running on port 8080.
 
-I attach docker-compose.yaml file and Dockerfile. So, you can run this application easily with [docker compose up]
+I attach docker-compose.yaml file and Dockerfile. So, you can run this application with [docker compose up]
