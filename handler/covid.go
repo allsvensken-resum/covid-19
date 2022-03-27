@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/suppakorn-dev/lmwn-covid-19/errs"
 	"github.com/suppakorn-dev/lmwn-covid-19/service"
 )
 
@@ -18,8 +19,14 @@ func NewCovidHandler(service service.ICovidSrv) CovidHandler {
 func (t CovidHandler) GetCovidPatientSummary(c *gin.Context) {
 	summary, err := t.covidService.GetCovidPatientSummary()
 
+	if err, ok := err.(errs.AppError); ok {
+		c.JSON(err.Code, gin.H{"Message": err.Message})
+		return
+	}
+
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, summary)
+		unexpectedErr, _ := errs.NewUnexpectedError().(errs.AppError)
+		c.JSON(unexpectedErr.Code, gin.H{"Message": unexpectedErr.Message})
 		return
 	}
 

@@ -3,6 +3,7 @@ package service
 import (
 	"log"
 
+	"github.com/suppakorn-dev/lmwn-covid-19/errs"
 	"github.com/suppakorn-dev/lmwn-covid-19/repository"
 )
 
@@ -18,7 +19,7 @@ func (t covidSrv) GetCovidPatientSummary() (PatientSummaryResp, error) {
 	patients, err := t.covidRepo.GetAllCovidPatient()
 	if err != nil {
 		log.Fatal(err)
-		return PatientSummaryResp{}, err
+		return PatientSummaryResp{}, errs.NewNotFoundError("Not found data")
 	}
 
 	patientsGroupByProvince := make(map[string]int)
