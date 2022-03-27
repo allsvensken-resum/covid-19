@@ -9,6 +9,7 @@ RUN go mod download
 COPY *.go ./
 COPY . ./
 
+RUN go test ./...
 RUN go build -o /lmwn-covid-19
 
 FROM gcr.io/distroless/base-debian10
