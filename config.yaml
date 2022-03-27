@@ -1,0 +1,5 @@
+app:
+  port: 80
+
+resource:
+  connection: "https://static.wongnai.com/devinterview/covid-cases.json"
