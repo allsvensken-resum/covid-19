@@ -26,26 +26,8 @@ func (t covidSrv) GetCovidPatientSummary() (PatientSummaryResp, error) {
 	patientsGroupByAge := initAgeRangesMap(ageRanges)
 
 	for _, patient := range patients {
-
-		if patient.Age == nil {
-			patientsGroupByAge["N/A"] = patientsGroupByAge["N/A"] + 1
-		} else if *patient.Age >= 0 && *patient.Age <= 30 {
-			patientsGroupByAge["0-30"] = patientsGroupByAge["0-30"] + 1
-		} else if *patient.Age >= 31 && *patient.Age <= 60 {
-			patientsGroupByAge["31-60"] = patientsGroupByAge["31-60"] + 1
-		} else if *patient.Age >= 61 {
-			patientsGroupByAge["61+"] = patientsGroupByAge["61+"] + 1
-
-		}
-		if patient.ProvinceEn == nil {
-			continue
-		}
-
-		if count, ok := patientsGroupByProvince[*patient.ProvinceEn]; ok {
-			patientsGroupByProvince[*patient.ProvinceEn] = count + 1
-		} else {
-			patientsGroupByProvince[*patient.ProvinceEn] = 1
-		}
+		groupPatientsByAge(patient, patientsGroupByAge)
+		groupPatientsByProvince(patient, patientsGroupByProvince)
 	}
 
 	return PatientSummaryResp{Province: patientsGroupByProvince, AgeGroup: patientsGroupByAge}, nil
@@ -59,4 +41,27 @@ func initAgeRangesMap(ageRanges []string) map[string]int {
 	}
 
 	return patientsGroupByAges
+}
+
+func groupPatientsByAge(patient repository.CovidPatient, patientsGroupByAge map[string]int) {
+	if patient.Age == nil {
+		patientsGroupByAge["N/A"] = patientsGroupByAge["N/A"] + 1
+	} else if *patient.Age >= 0 && *patient.Age <= 30 {
+		patientsGroupByAge["0-30"] = patientsGroupByAge["0-30"] + 1
+	} else if *patient.Age >= 31 && *patient.Age <= 60 {
+		patientsGroupByAge["31-60"] = patientsGroupByAge["31-60"] + 1
+	} else if *patient.Age >= 61 {
+		patientsGroupByAge["61+"] = patientsGroupByAge["61+"] + 1
+	}
+}
+
+func groupPatientsByProvince(patient repository.CovidPatient, patientsGroupByProvince map[string]int) {
+	if patient.ProvinceEn == nil {
+		return
+	}
+	if count, ok := patientsGroupByProvince[*patient.ProvinceEn]; ok {
+		patientsGroupByProvince[*patient.ProvinceEn] = count + 1
+		return
+	}
+	patientsGroupByProvince[*patient.ProvinceEn] = 1
 }
