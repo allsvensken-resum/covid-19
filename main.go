@@ -19,7 +19,8 @@ import (
 )
 
 func main() {
-	initConfig()
+	initViperConfig()
+
 	URL := viper.GetString("resource.connection")
 	PORT := viper.GetString("app.port")
 
@@ -31,10 +32,14 @@ func main() {
 	router.GET("/covid/summary", covidHandler.GetCovidPatientSummary)
 
 	srv := &http.Server{
-		Addr:    PORT,
-		Handler: router,
+		Addr:         ":" + PORT,
+		Handler:      router,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
 	}
 
+	log.Println("URL : ", URL)
+	log.Println("PORT : ", PORT)
 	// Initializing the server in a goroutine so that
 	// it won't block the graceful shutdown handling below
 	go func() {
@@ -66,15 +71,16 @@ func main() {
 
 }
 
-func initConfig() {
+func initViperConfig() {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
+	viper.AddConfigPath("/app")
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		panic(err)
+		log.Println("Config file not found, You can set env variable instead.")
 	}
 }
