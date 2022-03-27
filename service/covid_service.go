@@ -22,46 +22,44 @@ func (t covidSrv) GetCovidPatientSummary() (PatientSummaryResp, error) {
 	}
 
 	patientsGroupByProvince := make(map[string]int)
-	ageRanges := []string{"0-30", "31-60", "61+", "N/A"}
-	patientsGroupByAge := initAgeRangesMap(ageRanges)
+	patientsGroupByAge := make(map[string]int)
 
 	for _, patient := range patients {
-		groupPatientsByAge(patient, patientsGroupByAge)
-		groupPatientsByProvince(patient, patientsGroupByProvince)
+		groupPatientsByProvince(patient.ProvinceEn, patientsGroupByProvince)
+		ageRange := decideAgeRange(patient.Age)
+		groupPatientsByAge(ageRange, patientsGroupByAge)
 	}
 
 	return PatientSummaryResp{Province: patientsGroupByProvince, AgeGroup: patientsGroupByAge}, nil
 }
 
-func initAgeRangesMap(ageRanges []string) map[string]int {
-	patientsGroupByAges := make(map[string]int)
-
-	for _, ageRange := range ageRanges {
-		patientsGroupByAges[ageRange] = 0
+func decideAgeRange(age *int) string {
+	if age == nil {
+		return "N/A"
+	} else if *age >= 0 && *age <= 30 {
+		return "0-30"
+	} else if *age >= 31 && *age <= 60 {
+		return "31-60"
 	}
-
-	return patientsGroupByAges
+	return "61+"
 }
 
-func groupPatientsByAge(patient repository.CovidPatient, patientsGroupByAge map[string]int) {
-	if patient.Age == nil {
-		patientsGroupByAge["N/A"] = patientsGroupByAge["N/A"] + 1
-	} else if *patient.Age >= 0 && *patient.Age <= 30 {
-		patientsGroupByAge["0-30"] = patientsGroupByAge["0-30"] + 1
-	} else if *patient.Age >= 31 && *patient.Age <= 60 {
-		patientsGroupByAge["31-60"] = patientsGroupByAge["31-60"] + 1
-	} else if *patient.Age >= 61 {
-		patientsGroupByAge["61+"] = patientsGroupByAge["61+"] + 1
+func groupPatientsByAge(ageRange string, patientsGroupByAge map[string]int) {
+	if count, ok := patientsGroupByAge[ageRange]; ok {
+		patientsGroupByAge[ageRange] = count + 1
+		return
 	}
+	patientsGroupByAge[ageRange] = 1
 }
 
-func groupPatientsByProvince(patient repository.CovidPatient, patientsGroupByProvince map[string]int) {
-	if patient.ProvinceEn == nil {
+func groupPatientsByProvince(province *string, patientsGroupByProvince map[string]int) {
+	if province == nil {
 		return
 	}
-	if count, ok := patientsGroupByProvince[*patient.ProvinceEn]; ok {
-		patientsGroupByProvince[*patient.ProvinceEn] = count + 1
+
+	if count, ok := patientsGroupByProvince[*province]; ok {
+		patientsGroupByProvince[*province] = count + 1
 		return
 	}
-	patientsGroupByProvince[*patient.ProvinceEn] = 1
+	patientsGroupByProvince[*province] = 1
 }
