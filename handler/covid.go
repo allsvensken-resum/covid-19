@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/suppakorn-dev/lmwn-covid-19/service"
 )
@@ -14,5 +16,12 @@ func NewCovidHandler(service service.ICovidSrv) CovidHandler {
 }
 
 func (t CovidHandler) GetCovidPatientSummary(c *gin.Context) {
+	summary, err := t.covidService.GetCovidPatientSummary()
 
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, summary)
+		return
+	}
+
+	c.JSON(http.StatusOK, summary)
 }

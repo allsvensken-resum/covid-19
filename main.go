@@ -12,9 +12,7 @@ func main() {
 	url := "https://static.wongnai.com/devinterview/covid-cases.json"
 	covidRepo := repository.NewCovidRepository(url)
 	covidSrv := service.NewCovidService(covidRepo)
-	covidSrv.GetCovidPatientSummary()
 	covidHandler := handler.NewCovidHandler(covidSrv)
-
 	router.GET("/covid/summary", covidHandler.GetCovidPatientSummary)
 	router.Run(":80")
 }
