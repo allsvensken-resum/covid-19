@@ -7,19 +7,23 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 	"github.com/suppakorn-dev/lmwn-covid-19/handler"
 	"github.com/suppakorn-dev/lmwn-covid-19/repository"
 	"github.com/suppakorn-dev/lmwn-covid-19/service"
 )
 
 func main() {
+	initConfig()
+	URL := viper.GetString("resource.connection")
+	PORT := viper.GetString("app.port")
 
-	url := "https://static.wongnai.com/devinterview/covid-cases.json"
-	covidRepo := repository.NewCovidRepository(url)
+	covidRepo := repository.NewCovidRepository(URL)
 	covidSrv := service.NewCovidService(covidRepo)
 	covidHandler := handler.NewCovidHandler(covidSrv)
 
@@ -27,7 +31,7 @@ func main() {
 	router.GET("/covid/summary", covidHandler.GetCovidPatientSummary)
 
 	srv := &http.Server{
-		Addr:    ":8080",
+		Addr:    PORT,
 		Handler: router,
 	}
 
@@ -60,4 +64,17 @@ func main() {
 
 	log.Println("Server exiting")
 
+}
+
+func initConfig() {
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(".")
+	viper.AutomaticEnv()
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+
+	err := viper.ReadInConfig()
+	if err != nil {
+		panic(err)
+	}
 }
